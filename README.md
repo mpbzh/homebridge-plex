@@ -12,7 +12,7 @@ sudo npm install -g homebridge-plex
 
 If you don't have a Homebridge installation yet, head over to the [project documetation](https://github.com/nfarina/homebridge) for more information.
 
-## Configuration
+## Configuration
 
 The plugin uses the following config values:
 
