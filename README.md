@@ -1,4 +1,6 @@
 # Plex Plugin for Homebridge
+[![npm](https://img.shields.io/npm/v/homebridge-plex.svg)](https://www.npmjs.com/package/homebridge-plex)
+[![npm](https://img.shields.io/npm/dt/homebridge-plex.svg)](https://www.npmjs.com/package/homebridge-plex)
 
 Use the active sessions on your Plex server as a sensor in Homebridge. Enable your cozy cinema light scene when Plex starts playing and go back to your normal lighting when playback stops.
 
