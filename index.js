@@ -28,7 +28,7 @@ function Plex(log, config) {
             url: "http://" + self.host + ":" + self.port + "/status/sessions",
             headers: {
                 Accept: 'application/json',
-                'X-Plex-Token': this.plexToken
+                'X-Plex-Token': self.plexToken
             }
         }, function (err, response, body) {
             if (err || response.statusCode !== 200) {
@@ -57,7 +57,7 @@ function Plex(log, config) {
 
                 if (stateMatch && self.player) {
                     rulesMatch = false;
-                    this.filter.forEach(function (rule) {
+                    self.filter.forEach(function (rule) {
                         var playerMatch = !rule.player || rule.player.indexOf(player) > -1;
                         var userMatch = !rule.user || rule.user.indexOf(user) > -1;
                         if (playerMatch && userMatch)
