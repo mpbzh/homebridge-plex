@@ -34,7 +34,6 @@ function Plex(log, config) {
             if (err || response.statusCode !== 200) {
                 var statusCode = response ? response.statusCode : 1;
                 self.log("Error getting state (status code %s): %s", statusCode, err);
-                callback(err);
                 return;
             }
 
