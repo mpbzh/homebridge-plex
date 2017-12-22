@@ -15,12 +15,69 @@ function Plex(log, config) {
     this.host = config["host"] || 'localhost';
     this.port = config["port"] || '32400';
     this.filter = config["filter"] || [];
-
+    this.pollingInterval = config["pollingInterval"] || 3;
     this.service = new Service.OccupancySensor(this.name);
-
+ 		 
     this.service
-        .getCharacteristic(Characteristic.OccupancyDetected)
-        .on('get', this.getState.bind(this));
+        .getCharacteristic(Characteristic.OccupancyDetected)	
+        .on('get', this.getState.bind(this));	
+    
+    var self = this;
+    setInterval(function(){
+        request.get({
+            url: "http://" + self.host + ":" + self.port + "/status/sessions",
+            headers: {
+                Accept: 'application/json',
+                'X-Plex-Token': this.plexToken
+            }
+        }, function (err, response, body) {
+            if (err || response.statusCode !== 200) {
+                var statusCode = response ? response.statusCode : 1;
+                self.log("Error getting state (status code %s): %s", statusCode, err);
+                callback(err);
+                return;
+            }
+
+            var data = JSON.parse(body);
+            data = data.MediaContainer;
+            var playing = false;
+
+            if (data.size === 0) {
+//                 self.log('No active sessions on your server. Plex is not playing.');
+                self.service.getCharacteristic(Characteristic.OccupancyDetected).updateValue(false);
+                return;
+            }
+
+            data.Video.forEach(function (e) {
+                var player = e.Player.title;
+                var user = e.User.title;
+                var state = e.Player.state;
+
+                var rulesMatch = true;
+                var stateMatch = state === 'playing';
+
+                if (stateMatch && self.player) {
+                    rulesMatch = false;
+                    this.filter.forEach(function (rule) {
+                        var playerMatch = !rule.player || rule.player.indexOf(player) > -1;
+                        var userMatch = !rule.user || rule.user.indexOf(user) > -1;
+                        if (playerMatch && userMatch)
+                            rulesMatch = true;
+                    });
+                }
+
+                var matchStr = rulesMatch ? '' : ' (ignored)';
+//                 self.log('→ %s [%s]: %s%s', user, player, state, matchStr);
+
+                if (stateMatch && rulesMatch)
+                    playing = true;
+
+//                 self.log('Plex is %splaying.', (playing ? '' : 'not '));
+                self.service.getCharacteristic(Characteristic.OccupancyDetected).updateValue(true);
+            })
+        })
+
+    }, this.pollingInterval*1000)
 }
 
 Plex.prototype.getState = function (callback) {
