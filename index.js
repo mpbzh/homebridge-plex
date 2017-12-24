@@ -58,8 +58,8 @@ function Plex(log, config) {
                 if (stateMatch && self.player) {
                     rulesMatch = false;
                     self.filter.forEach(function (rule) {
-                        var playerMatch = !rule.player || rule.player.indexOf(player) > -1;
-                        var userMatch = !rule.user || rule.user.indexOf(user) > -1;
+                        var playerMatch = !rule.player || rule.player.indexOf(rule.player) > -1;
+                        var userMatch = !rule.user || rule.user.indexOf(rule.user) > -1;
                         if (playerMatch && userMatch)
                             rulesMatch = true;
                     });
@@ -122,8 +122,8 @@ Plex.prototype.getState = function (callback) {
             if (stateMatch && this.player) {
                 rulesMatch = false;
                 this.filter.forEach(function (rule) {
-                    var playerMatch = !rule.player || rule.player.indexOf(player) > -1;
-                    var userMatch = !rule.user || rule.user.indexOf(user) > -1;
+                    var playerMatch = !rule.player || rule.player.indexOf(rule.player) > -1;
+                    var userMatch = !rule.user || rule.user.indexOf(rule.user) > -1;
                     if (playerMatch && userMatch)
                         rulesMatch = true;
                 });
