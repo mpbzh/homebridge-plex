@@ -15,7 +15,7 @@ function Plex(log, config) {
     this.host = config["host"] || 'localhost';
     this.port = config["port"] || '32400';
     this.filter = config["filter"] || [];
-    this.pollingInterval = config["pollingInterval"] || 3;
+    this.pollingInterval = config["pollingInterval"] || 2;
     this.service = new Service.OccupancySensor(this.name);
  		 
     this.service
@@ -23,7 +23,7 @@ function Plex(log, config) {
         .on('get', this.getState.bind(this));	
     
     var self = this;
-    setInterval(function(){
+    self.pollingStatus = function(){
         request.get({
             url: "http://" + self.host + ":" + self.port + "/status/sessions",
             headers: {
@@ -42,11 +42,14 @@ function Plex(log, config) {
             var playing = false;
 
             if (data.size === 0) {
-//                 self.log('No active sessions on your server. Plex is not playing.');
+                // self.log('No active sessions on your server. Plex is not playing.');
                 self.service.getCharacteristic(Characteristic.OccupancyDetected).updateValue(false);
+                setTimeout(function(){
+                    self.pollingStatus()
+                }, self.pollingInterval*1000)
                 return;
             }
-
+            var playing = false;
             data.Video.forEach(function (e) {
                 var player = e.Player.title;
                 var user = e.User.title;
@@ -68,17 +71,23 @@ function Plex(log, config) {
                 var matchStr = rulesMatch ? '' : ' (ignored)';
                 // self.log('→ %s [%s]: %s%s', user, player, state, matchStr);
 
-                if (stateMatch && rulesMatch){
+                if (stateMatch && rulesMatch)
                     playing = true;
-                    self.service.getCharacteristic(Characteristic.OccupancyDetected).updateValue(true);
-                } else {
-                    self.service.getCharacteristic(Characteristic.OccupancyDetected).updateValue(false);
-                }
+                
                 // self.log('Plex is %splaying.', (playing ? '' : 'not '));
             })
-        })
+            if (playing) {
+                self.service.getCharacteristic(Characteristic.OccupancyDetected).updateValue(true);
+            } else {
+                self.service.getCharacteristic(Characteristic.OccupancyDetected).updateValue(false);
+            }
+            setTimeout(function(){
+                self.pollingStatus()
+            }, self.pollingInterval*1000)
+            })
 
-    }, this.pollingInterval*1000)
+    }
+    self.pollingStatus();
 }
 
 Plex.prototype.getState = function (callback) {
@@ -139,8 +148,9 @@ Plex.prototype.getState = function (callback) {
             if (stateMatch && rulesMatch) playing = true;
 
             this.log('Plex is %splaying.', (playing ? '' : 'not '));
-            callback(null, playing);
+            
         }.bind(this));
+        callback(null, playing);
     }.bind(this));
 }
 
