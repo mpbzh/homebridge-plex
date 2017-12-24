@@ -55,24 +55,26 @@ function Plex(log, config) {
                 var rulesMatch = true;
                 var stateMatch = state === 'playing';
 
-                if (stateMatch && self.player) {
+                if (stateMatch && player) {
                     rulesMatch = false;
                     self.filter.forEach(function (rule) {
-                        var playerMatch = !rule.player || rule.player.indexOf(rule.player) > -1;
-                        var userMatch = !rule.user || rule.user.indexOf(rule.user) > -1;
+                        var playerMatch = !rule.player || rule.player.indexOf(player) > -1;
+                        var userMatch = !rule.user || rule.user.indexOf(user) > -1;
                         if (playerMatch && userMatch)
                             rulesMatch = true;
                     });
                 }
 
                 var matchStr = rulesMatch ? '' : ' (ignored)';
-//                 self.log('→ %s [%s]: %s%s', user, player, state, matchStr);
+                // self.log('→ %s [%s]: %s%s', user, player, state, matchStr);
 
-                if (stateMatch && rulesMatch)
+                if (stateMatch && rulesMatch){
                     playing = true;
-
-//                 self.log('Plex is %splaying.', (playing ? '' : 'not '));
-                self.service.getCharacteristic(Characteristic.OccupancyDetected).updateValue(true);
+                    self.service.getCharacteristic(Characteristic.OccupancyDetected).updateValue(true);
+                } else {
+                    self.service.getCharacteristic(Characteristic.OccupancyDetected).updateValue(false);
+                }
+                // self.log('Plex is %splaying.', (playing ? '' : 'not '));
             })
         })
 
@@ -118,12 +120,14 @@ Plex.prototype.getState = function (callback) {
 
             var rulesMatch = true;
             var stateMatch = state === 'playing';
-
-            if (stateMatch && this.player) {
+            var self = this
+            if (stateMatch && player) {
                 rulesMatch = false;
                 this.filter.forEach(function (rule) {
-                    var playerMatch = !rule.player || rule.player.indexOf(rule.player) > -1;
-                    var userMatch = !rule.user || rule.user.indexOf(rule.user) > -1;
+                    self.log(rule.player + " vs " + player)
+                    self.log(rule.user + " vs " + user)
+                    var playerMatch = !rule.player || rule.player.indexOf(player) > -1;
+                    var userMatch = !rule.user || rule.user.indexOf(user) > -1;
                     if (playerMatch && userMatch)
                         rulesMatch = true;
                 });
@@ -132,8 +136,7 @@ Plex.prototype.getState = function (callback) {
             var matchStr = rulesMatch ? '' : ' (ignored)';
             this.log('→ %s [%s]: %s%s', user, player, state, matchStr);
 
-            if (stateMatch && rulesMatch)
-                playing = true;
+            if (stateMatch && rulesMatch) playing = true;
 
             this.log('Plex is %splaying.', (playing ? '' : 'not '));
             callback(null, playing);
