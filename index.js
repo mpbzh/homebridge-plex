@@ -15,12 +15,29 @@ function Plex(log, config) {
     this.host = config["host"] || 'localhost';
     this.port = config["port"] || '32400';
     this.filter = config["filter"] || [];
-
+    this.pollingInterval = config["polling_interval"] || 3;
     this.service = new Service.OccupancySensor(this.name);
 
     this.service
         .getCharacteristic(Characteristic.OccupancyDetected)
         .on('get', this.getState.bind(this));
+
+    var self = this;
+
+    var callback = function(err, value) {
+        setTimeout(function() {
+            self.getState(callback);
+        }, self.pollingInterval * 1000);
+
+        if (err !== null)
+            return;
+
+        self.service
+            .getCharacteristic(Characteristic.OccupancyDetected)
+            .updateValue(value);
+    };
+    
+    self.getState(callback);
 }
 
 Plex.prototype.getState = function (callback) {
@@ -62,10 +79,12 @@ Plex.prototype.getState = function (callback) {
 
             var rulesMatch = true;
             var stateMatch = state === 'playing';
-
-            if (stateMatch && this.player) {
+            var self = this
+            if (stateMatch && player) {
                 rulesMatch = false;
-                this.filter.forEach(function (rule) {
+                self.filter.forEach(function (rule) {
+                    self.log(rule.player + " vs " + player)
+                    self.log(rule.user + " vs " + user)
                     var playerMatch = !rule.player || rule.player.indexOf(player) > -1;
                     var userMatch = !rule.user || rule.user.indexOf(user) > -1;
                     if (playerMatch && userMatch)
@@ -74,14 +93,13 @@ Plex.prototype.getState = function (callback) {
             }
 
             var matchStr = rulesMatch ? '' : ' (ignored)';
-            this.log('→ %s [%s]: %s%s', user, player, state, matchStr);
+            self.log('→ %s [%s]: %s%s', user, player, state, matchStr);
 
-            if (stateMatch && rulesMatch)
-                playing = true;
+            playing = stateMatch && rulesMatch;
 
-            this.log('Plex is %splaying.', (playing ? '' : 'not '));
-            callback(null, playing);
+            self.log('Plex is %splaying.', (playing ? '' : 'not '));
         }.bind(this));
+        callback(null, playing);
     }.bind(this));
 }
 
