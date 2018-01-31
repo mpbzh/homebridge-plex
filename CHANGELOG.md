@@ -12,5 +12,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Initial Release
 
-[Unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/v1.1.0...HEAD
-[1.1.0]: https://github.com/olivierlacan/keep-a-changelog/compare/v1.0.0...v1.1.0
+[Unreleased]: https://github.com/mpbzh/homebridge-plex/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/mpbzh/homebridge-plex/compare/v1.0.0...v1.1.0
