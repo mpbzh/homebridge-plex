@@ -24,36 +24,40 @@ function Plex(log, config) {
         .getCharacteristic(Characteristic.OccupancyDetected)
         .on('get', this.getState.bind(this));
 
+    var self = this;
+
     var callback = function(err, value) {
         setTimeout(function() {
-            this.getState(callback);
-        }, this.pollingInterval * 1000);
+            self.getState(callback);
+        }, self.pollingInterval * 1000);
 
         if (err !== null)
             return;
 
-        this.service
+        self.service
             .getCharacteristic(Characteristic.OccupancyDetected)
             .updateValue(value);
     };
     
-    this.getState(callback);
+    self.getState(callback);
 }
 
 Plex.prototype.getState = function (callback) {
-    if (this.debug)
-        this.log("Getting current state...");
+    var self = this;
+
+    if (self.debug)
+        self.log("Getting current state...");
 
     request.get({
-        url: "http://" + this.host + ":" + this.port + "/status/sessions",
+        url: "http://" + self.host + ":" + self.port + "/status/sessions",
         headers: {
             Accept: 'application/json',
-            'X-Plex-Token': this.plexToken
+            'X-Plex-Token': self.plexToken
         }
     }, function (err, response, body) {
         if (err || response.statusCode !== 200) {
             var statusCode = response ? response.statusCode : 1;
-            this.log("Error getting state (status code %s): %s", statusCode, err);
+            self.log("Error getting state (status code %s): %s", statusCode, err);
             callback(err);
             return;
         }
@@ -63,18 +67,18 @@ Plex.prototype.getState = function (callback) {
         var playing = false;
 
         if (data.size === 0) {
-            if (this.debug)
-                this.log('No active sessions on your server. Plex is not playing.');
+            if (self.debug)
+                self.log('No active sessions on your server. Plex is not playing.');
 
             callback(null, false);
             return;
         }
 
-        if (!this.debug);
+        if (!self.debug);
         else if (data.size === 1)
-            this.log('There is one active session:');
+            self.log('There is one active session:');
         else
-            this.log('There are %s active sessions:', data.size);
+            self.log('There are %s active sessions:', data.size);
 
         data.Video.forEach(function (e) {
             var player = e.Player.title;
@@ -85,10 +89,10 @@ Plex.prototype.getState = function (callback) {
             var stateMatch = state === 'playing';
             if (stateMatch && player) {
                 rulesMatch = false;
-                this.filter.forEach(function (rule) {
-                    if (this.debug) {
-                        this.log(rule.player + " vs " + player)
-                        this.log(rule.user + " vs " + user)
+                self.filter.forEach(function (rule) {
+                    if (self.debug) {
+                        self.log(rule.player + " vs " + player)
+                        self.log(rule.user + " vs " + user)
                     }
                     var playerMatch = !rule.player || rule.player.indexOf(player) > -1;
                     var userMatch = !rule.user || rule.user.indexOf(user) > -1;
@@ -97,16 +101,16 @@ Plex.prototype.getState = function (callback) {
                 });
             }
 
-            if (this.debug)
-                this.log('→ %s [%s]: %s%s', user, player, state, rulesMatch ? '' : ' (ignored)');
+            if (self.debug)
+                self.log('→ %s [%s]: %s%s', user, player, state, rulesMatch ? '' : ' (ignored)');
 
             playing = stateMatch && rulesMatch;
             
-            if (this.debug || this.playing !== playing)
-                this.log('Plex is %splaying.', (playing ? '' : 'not '));
-        }.bind(this));
+            if (self.debug || self.playing !== playing)
+                self.log('Plex is %splaying.', (playing ? '' : 'not '));
+        });
         callback(null, playing);
-    }.bind(this));
+    });
 }
 
 Plex.prototype.getServices = function () {
