@@ -35,7 +35,7 @@ Typical config example:
     {
       "accessory": "Plex",
       "name": "Plex",
-      "plex_token": "​...",
+      "plex_token": "...",
       "filter": [
         {
             "user": "your-plex-username",
