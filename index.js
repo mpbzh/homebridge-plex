@@ -20,6 +20,9 @@ function Plex(log, config) {
     this.service = new Service.OccupancySensor(this.name);
     this.playing = false;
 
+    // Get cached state
+    playing = this.storage.getItemSync(this.name) === true;
+
     this.service
         .getCharacteristic(Characteristic.OccupancyDetected)
         .on('get', this.getState.bind(this));
@@ -109,6 +112,9 @@ Plex.prototype.getState = function (callback) {
             if (self.debug || self.playing !== playing)
                 self.log('Plex is %splaying.', (playing ? '' : 'not '));
         });
+        // Get cached state
+        self.storage.setItemSync(this.name, playing);
+
         callback(null, playing);
     });
 }
