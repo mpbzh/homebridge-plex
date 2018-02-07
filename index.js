@@ -29,8 +29,8 @@ function Plex(log, config) {
 
     var self = this;
 
-    var callback = function(err, value) {
-        setTimeout(function() {
+    var callback = function (err, value) {
+        setTimeout(function () {
             self.getState(callback);
         }, self.pollingInterval * 1000);
 
@@ -41,7 +41,7 @@ function Plex(log, config) {
             .getCharacteristic(Characteristic.OccupancyDetected)
             .updateValue(value);
     };
-    
+
     self.getState(callback);
 }
 
@@ -94,13 +94,12 @@ Plex.prototype.getState = function (callback) {
                 rulesMatch = false;
                 self.filter.forEach(function (rule) {
                     if (self.debug) {
-                        self.log(rule.player + " vs " + player)
-                        self.log(rule.user + " vs " + user)
+                        self.log("'" + rule.player + "' vs '" + player + "'")
+                        self.log("'" + rule.user + "' vs '" + user + "'")
                     }
                     var playerMatch = !rule.player || rule.player.indexOf(player) > -1;
                     var userMatch = !rule.user || rule.user.indexOf(user) > -1;
-                    if (playerMatch && userMatch)
-                        rulesMatch = true;
+                    rulesMatch = rulesMatch || playerMatch && userMatch;
                 });
             }
 
@@ -112,6 +111,7 @@ Plex.prototype.getState = function (callback) {
             if (self.debug || self.playing !== playing)
                 self.log('Plex is %splaying.', (playing ? '' : 'not '));
         });
+
         // Get cached state
         self.storage.setItemSync(this.name, playing);
 
