@@ -26,7 +26,8 @@ Variable | Description
 `host` | The hostname / IP address of your Plex server. Defaults to `localhost`, can be omitted if Homebridge runs on the same server as your Plex.
 `port` | The port of your Plex server. Defaults to `32400`
 `filter` | An array of filter rules. See [filtering sessions](#filtering-sessions)
-`polling_interval` | Interval in seconds in which the play state is checked. Default is 3, lower values are discuraged.
+`polling_interval` | Interval in seconds in which the play state is checked. Default is `3`, lower values are discuraged.
+`debug` | Set this to true to receive detailed debug information about active sessions and filtering. This is not recommended for permanent installations as it [fills up your log files pretty quickly](https://github.com/mpbzh/homebridge-plex/issues/6).
 
 Typical config example:
 ```json
