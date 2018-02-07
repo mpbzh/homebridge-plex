@@ -107,8 +107,8 @@ Plex.prototype.getState = function (callback) {
             if (self.debug)
                 self.log('→ %s [%s]: %s%s', user, player, state, rulesMatch ? '' : ' (ignored)');
 
-            playing = stateMatch && rulesMatch;
-            
+            playing = playing || stateMatch && rulesMatch;
+
             if (self.debug || self.playing !== playing)
                 self.log('Plex is %splaying.', (playing ? '' : 'not '));
         });
