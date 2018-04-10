@@ -80,7 +80,7 @@ Plex.prototype.getState = function (callback) {
         else
             self.log('There are %s active sessions:', data.size);
 
-        data.Video.forEach(function (e) {
+        data.Metadata.forEach(function (e) {
             var player = e.Player.title;
             var user = e.User.title;
             var state = e.Player.state;
