@@ -61,7 +61,7 @@ If you define a filter rule only containing a `user` value, any device of that u
 
 ### Finding your user and player name
 
-Just start a movie on the device you want to trigger the sensor and head over to the [Plex web app](https://app.plex.tv/desktop). Navigate to Status -> Now Playing.
+Just start a movie on the device you want to trigger the sensor and head over to the [Plex web app](https://app.plex.tv/desktop). Navigate to Status -> Dashoard -> Current playback. Toggle "show details" on the top right and find the player name here:
 
 ![Now Playing in the Plex web app](doc/now-playing.png)
 
