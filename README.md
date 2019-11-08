@@ -65,4 +65,4 @@ Just start a movie on the device you want to trigger the sensor and head over to
 
 ![Now Playing in the Plex web app](doc/now-playing.png)
 
-The `player` is in the upper left corner (in this example it's "your-player") and the `name` is next to your profile picture in the bottom right (here "your-user").
+The `player` is in the upper left corner (in this example it's "TVBox") and the `name` is next to your profile picture in the bottom (not depicted).
