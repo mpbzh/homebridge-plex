@@ -80,6 +80,12 @@ Plex.prototype.getState = function (callback) {
         else
             self.log('There are %s active sessions:', data.size);
 
+        if (!data.Metadata) {
+            self.log('No metadata object found!');
+            self.playing = playing;
+            callback(null, playing);
+        }
+
         data.Metadata.forEach(function (e) {
             var player = e.Player.title;
             var user = e.User.title;
