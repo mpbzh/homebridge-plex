@@ -1,6 +1,6 @@
 {
   "name": "homebridge-plex",
-  "version": "1.1.4",
+  "version": "1.1.6",
   "description": "Plex plugin for homebridge: https://github.com/nfarina/homebridge",
   "license": "MIT",
   "keywords": [
